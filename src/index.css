@@ -1,0 +1,151 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0a0a0a;
+  --color-card: #141414;
+  --color-success: #22c55e;
+  --color-fail: #ef4444;
+  --color-border: #262626;
+  --color-muted: #525252;
+
+  /* Bears colors */
+  --color-bears-navy: #0B162A;
+  --color-bears-orange: #C83803;
+
+  --font-mono: "Space Mono", monospace;
+  --font-heading: "Archivo", sans-serif;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: #e5e5e5;
+  font-family: var(--font-heading);
+  min-height: 100vh;
+}
+
+/* Medal metallic gradients */
+.medal-bronze {
+  background: linear-gradient(145deg, #cd7f32 0%, #8b4513 50%, #cd7f32 100%);
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.5),
+    inset 0 2px 4px rgba(255,255,255,0.3),
+    inset 0 -2px 4px rgba(0,0,0,0.3);
+}
+
+.medal-silver {
+  background: linear-gradient(145deg, #e8e8e8 0%, #a8a8a8 50%, #e8e8e8 100%);
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.5),
+    inset 0 2px 4px rgba(255,255,255,0.5),
+    inset 0 -2px 4px rgba(0,0,0,0.2);
+}
+
+.medal-gold {
+  background: linear-gradient(145deg, #ffd700 0%, #b8860b 50%, #ffd700 100%);
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.5),
+    0 0 15px rgba(255,215,0,0.3),
+    inset 0 2px 4px rgba(255,255,255,0.4),
+    inset 0 -2px 4px rgba(0,0,0,0.2);
+}
+
+.medal-platinum {
+  background: linear-gradient(145deg, #e5e4e2 0%, #8e9196 30%, #e5e4e2 50%, #8e9196 70%, #e5e4e2 100%);
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.5),
+    0 0 20px rgba(229,228,226,0.4),
+    inset 0 2px 4px rgba(255,255,255,0.6),
+    inset 0 -2px 4px rgba(0,0,0,0.2);
+}
+
+.medal-locked {
+  background: linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 50%, #2a2a2a 100%);
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.3),
+    inset 0 1px 2px rgba(255,255,255,0.05);
+}
+
+/* Day cell states */
+.day-cell {
+  transition: all 0.15s ease;
+}
+
+.day-cell:hover:not(.day-future) {
+  transform: scale(1.02);
+  border-color: #404040;
+}
+
+.day-today {
+  box-shadow: 0 0 0 2px #ffffff;
+}
+
+.day-future {
+  border-style: dashed;
+  opacity: 0.5;
+}
+
+/* Animations */
+@keyframes shimmer {
+  0% { background-position: -100% 0; }
+  100% { background-position: 100% 0; }
+}
+
+.medal-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.medal-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,0.2) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* FTP reveal animation */
+@keyframes ftp-scale {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.ftp-reveal {
+  animation: ftp-scale 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Shake animation for wrong password */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-10px); }
+  40% { transform: translateX(10px); }
+  60% { transform: translateX(-10px); }
+  80% { transform: translateX(10px); }
+}
+
+.shake {
+  animation: shake 0.4s ease-in-out;
+}
