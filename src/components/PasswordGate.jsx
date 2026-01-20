@@ -36,7 +36,7 @@ export function PasswordGate({ onSuccess }) {
     <div className="fixed inset-0 bg-bg flex items-center justify-center z-50">
       <div className="w-full max-w-sm px-6">
         <div className="text-center mb-8">
-          <p className="font-mono text-xs text-muted tracking-widest uppercase mb-1">Peep Game</p>
+          <p className="font-mono text-sm text-success tracking-widest uppercase mb-1 font-bold">// Peep Game</p>
           <h1 className="font-mono font-bold text-4xl tracking-tighter text-white">
             LOCKED IN<span className="text-success animate-pulse">.</span>
           </h1>

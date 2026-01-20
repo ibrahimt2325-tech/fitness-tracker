@@ -20,7 +20,7 @@ function App() {
     <div className="min-h-screen bg-bg px-4 py-8 md:px-8">
       {/* Header */}
       <header className="max-w-6xl mx-auto mb-10">
-        <p className="font-mono text-xs text-muted tracking-widest uppercase mb-1">Peep Game</p>
+        <p className="font-mono text-sm text-success tracking-widest uppercase mb-1 font-bold">// Peep Game</p>
         <h1 className="font-mono font-bold text-4xl md:text-5xl tracking-tighter text-white">
           LOCKED IN<span className="text-success animate-pulse">.</span>
         </h1>

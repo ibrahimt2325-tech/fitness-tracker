@@ -41,7 +41,7 @@ export function WeekView() {
         onNextWeek={handleNextWeek}
       />
 
-      <div className="flex gap-6 flex-wrap lg:flex-nowrap">
+      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
         {users.map(user => (
           <PlayerCard
             key={user.id}

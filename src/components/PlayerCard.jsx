@@ -37,7 +37,7 @@ export function PlayerCard({
   }
 
   return (
-    <div className="bg-card border border-border rounded-2xl p-5 flex-1 min-w-[320px]">
+    <div className="bg-card border border-border rounded-2xl p-3 sm:p-5 flex-1 w-full">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-heading font-bold text-xl">
@@ -94,7 +94,7 @@ export function PlayerCard({
       </div>
 
       {/* Days grid */}
-      <div className="grid grid-cols-7 gap-2 mb-5">
+      <div className="grid grid-cols-7 gap-1 sm:gap-2 mb-5">
         {days.map(day => {
           const dateKey = formatDateKey(day)
           return (

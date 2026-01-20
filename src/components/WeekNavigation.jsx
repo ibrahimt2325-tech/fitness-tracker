@@ -17,8 +17,8 @@ export function WeekNavigation({ weekStart, onPrevWeek, onNextWeek }) {
         </svg>
       </button>
 
-      <div className="text-center min-w-[240px]">
-        <div className="font-heading font-semibold text-lg">
+      <div className="text-center min-w-[180px] sm:min-w-[240px]">
+        <div className="font-heading font-semibold text-sm sm:text-lg">
           {formatWeekRange(weekStart)}
         </div>
         {isCurrentWeek && (
