@@ -36,7 +36,7 @@ export function useWeekData(weekStart) {
 
       try {
         // Fetch users (including current_book and book_total_pages)
-        const { data: usersData } = await supabase.from('users').select('*')
+        const { data: usersData } = await supabase.from('users').select('*').order('created_at')
         if (usersData) setUsers(usersData)
 
         // Get date range for the week, plus one lookback day before week start

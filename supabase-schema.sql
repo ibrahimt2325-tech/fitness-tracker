@@ -59,6 +59,7 @@ ALTER TABLE achievements ENABLE ROW LEVEL SECURITY;
 
 -- Policies: Allow all authenticated users to read everything (it's a shared challenge)
 CREATE POLICY "Anyone can view users" ON users FOR SELECT USING (true);
+CREATE POLICY "Anyone can update users" ON users FOR UPDATE USING (true);
 CREATE POLICY "Anyone can view daily_logs" ON daily_logs FOR SELECT USING (true);
 CREATE POLICY "Anyone can view weekly_logs" ON weekly_logs FOR SELECT USING (true);
 CREATE POLICY "Anyone can view achievements" ON achievements FOR SELECT USING (true);
