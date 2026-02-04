@@ -14,6 +14,7 @@ export function WeekView() {
     loading,
     saveDailyLog,
     saveWeeklyLog,
+    saveCurrentBook,
   } = useWeekData(weekStart)
 
   // Mock streaks for demo - in real app would calculate from full history
@@ -52,6 +53,7 @@ export function WeekView() {
             streaks={mockStreaks[user.id] || {}}
             onSaveDailyLog={saveDailyLog}
             onSaveWeeklyLog={saveWeeklyLog}
+            onSaveCurrentBook={saveCurrentBook}
             isCurrentUser={true}
           />
         ))}

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase, DEMO_USERS, createDemoData } from '../lib/supabase'
 import { formatDateKey, getWeekDays } from '../lib/dates'
+import { subDays } from 'date-fns'
 
 export function useWeekData(weekStart) {
   const [users, setUsers] = useState(DEMO_USERS)
@@ -26,6 +27,7 @@ export function useWeekData(weekStart) {
           weekly[user.id] = demoData[user.id].weekly
         })
 
+        setUsers([...DEMO_USERS])
         setDailyLogs(daily)
         setWeeklyLogs(weekly)
         setLoading(false)
@@ -33,16 +35,17 @@ export function useWeekData(weekStart) {
       }
 
       try {
-        // Fetch users
+        // Fetch users (including current_book and book_total_pages)
         const { data: usersData } = await supabase.from('users').select('*')
         if (usersData) setUsers(usersData)
 
-        // Get date range for the week
+        // Get date range for the week, plus one lookback day before week start
         const days = getWeekDays(weekStart)
-        const startDate = formatDateKey(days[0])
+        const lookbackDay = subDays(days[0], 1)
+        const startDate = formatDateKey(lookbackDay)
         const endDate = formatDateKey(days[6])
 
-        // Fetch daily logs
+        // Fetch daily logs (including lookback day for Monday's delta)
         const { data: dailyData } = await supabase
           .from('daily_logs')
           .select('*')
@@ -138,6 +141,32 @@ export function useWeekData(weekStart) {
     }
   }, [weekStartKey])
 
+  // Save current book for a user
+  const saveCurrentBook = useCallback(async (userId, bookTitle, totalPages) => {
+    // Optimistic update
+    setUsers(prev => prev.map(u =>
+      u.id === userId
+        ? { ...u, current_book: bookTitle || null, book_total_pages: totalPages || null }
+        : u
+    ))
+
+    if (!supabase) return
+
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({
+          current_book: bookTitle || null,
+          book_total_pages: totalPages || null,
+        })
+        .eq('id', userId)
+
+      if (error) throw error
+    } catch (error) {
+      console.error('Error saving current book:', error)
+    }
+  }, [])
+
   return {
     users,
     dailyLogs,
@@ -145,5 +174,6 @@ export function useWeekData(weekStart) {
     loading,
     saveDailyLog,
     saveWeeklyLog,
+    saveCurrentBook,
   }
 }

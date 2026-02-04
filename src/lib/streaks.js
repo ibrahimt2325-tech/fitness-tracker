@@ -1,9 +1,10 @@
 import { GOALS, STREAK_MILESTONES, STREAK_MILESTONES_WEEKLY } from '../types'
+import { computePagesRead, readingGoalMet } from './pages'
 
 /**
  * Calculate current streak for a daily activity
  * @param {Object} dailyLogs - Object with date keys and log values
- * @param {string} field - 'steps', 'pages', or 'stretched'
+ * @param {string} field - 'steps', 'current_page', or 'stretched'
  * @param {number|boolean} threshold - Minimum value or true for boolean
  * @returns {number} Current streak in days
  */
@@ -23,6 +24,40 @@ export function calculateDailyStreak(dailyLogs, field, threshold) {
     }
 
     if (hitGoal) {
+      streak++
+    } else {
+      break
+    }
+  }
+
+  return streak
+}
+
+/**
+ * Calculate reading streak using page deltas instead of raw values.
+ * Sorts dates, computes running deltas, then checks against goal.
+ * @param {Object} dailyLogs - Object with date keys and log values (must have current_page)
+ * @returns {number} Current reading streak in days
+ */
+export function calculateReadingStreak(dailyLogs) {
+  const dates = Object.keys(dailyLogs).sort()
+  if (dates.length === 0) return 0
+
+  // Build a map of pagesRead per day
+  const pagesReadMap = {}
+  for (let i = 0; i < dates.length; i++) {
+    const log = dailyLogs[dates[i]]
+    const prevLog = i > 0 ? dailyLogs[dates[i - 1]] : null
+    const prevPage = prevLog?.current_page ?? null
+    pagesReadMap[dates[i]] = computePagesRead(log.current_page ?? null, prevPage)
+  }
+
+  // Now count streak in reverse
+  const reverseDates = [...dates].reverse()
+  let streak = 0
+
+  for (const date of reverseDates) {
+    if (readingGoalMet(pagesReadMap[date])) {
       streak++
     } else {
       break
@@ -108,7 +143,7 @@ export function getHighestMedal(streak, isWeekly = false) {
 export function calculateAllStreaks(dailyLogs, weeklyLogs, liftingByWeek) {
   return {
     steps: calculateDailyStreak(dailyLogs, 'steps', GOALS.steps),
-    reading: calculateDailyStreak(dailyLogs, 'pages', GOALS.pages),
+    reading: calculateReadingStreak(dailyLogs),
     stretch: calculateDailyStreak(dailyLogs, 'stretched', true),
     lifting: calculateLiftingStreak(liftingByWeek),
     running: calculateRunningStreak(weeklyLogs),

@@ -5,6 +5,8 @@
 CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
+  current_book TEXT,
+  book_total_pages INTEGER,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -14,7 +16,8 @@ CREATE TABLE daily_logs (
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   date DATE NOT NULL,
   steps INTEGER,
-  pages INTEGER,
+  current_page INTEGER,
+  learned TEXT,
   stretched BOOLEAN DEFAULT FALSE,
   lifted BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -89,3 +92,10 @@ CREATE TRIGGER daily_logs_updated_at
 CREATE TRIGGER weekly_logs_updated_at
   BEFORE UPDATE ON weekly_logs
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- Migration: Book tracking revamp
+-- Run these if you already have the tables created:
+-- ALTER TABLE daily_logs RENAME COLUMN pages TO current_page;
+-- ALTER TABLE daily_logs ADD COLUMN learned TEXT;
+-- ALTER TABLE users ADD COLUMN current_book TEXT;
+-- ALTER TABLE users ADD COLUMN book_total_pages INTEGER;

@@ -4,6 +4,8 @@
  * @typedef {Object} User
  * @property {string} id
  * @property {string} name
+ * @property {string|null} current_book
+ * @property {number|null} book_total_pages
  */
 
 /**
@@ -12,9 +14,10 @@
  * @property {string} user_id
  * @property {string} date - ISO date string (YYYY-MM-DD)
  * @property {number|null} steps
- * @property {number|null} pages
+ * @property {number|null} current_page - the page number the user is on
  * @property {boolean} stretched
  * @property {boolean} lifted
+ * @property {string|null} learned - daily learning note
  */
 
 /**

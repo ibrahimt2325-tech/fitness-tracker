@@ -1,5 +1,6 @@
 import { formatDate, isToday, isFuture } from '../lib/dates'
 import { GOALS } from '../types'
+import { readingGoalMet } from '../lib/pages'
 
 function GoalIndicator({ hit, label, value, unit }) {
   return (
@@ -15,13 +16,13 @@ function GoalIndicator({ hit, label, value, unit }) {
   )
 }
 
-export function DayCell({ date, log, onClick, disabled = false }) {
+export function DayCell({ date, log, onClick, disabled = false, pagesRead }) {
   const today = isToday(date)
   const future = isFuture(date)
-  const hasData = log && (log.steps !== null || log.pages !== null || log.stretched !== undefined || log.lifted !== undefined)
+  const hasData = log && (log.steps !== null || log.current_page !== null || log.stretched !== undefined || log.lifted !== undefined)
 
   const stepsHit = log?.steps >= GOALS.steps
-  const pagesHit = log?.pages >= GOALS.pages
+  const pagesHit = readingGoalMet(pagesRead)
   const stretchedHit = log?.stretched === true
   const liftedHit = log?.lifted === true
 
@@ -88,15 +89,15 @@ export function DayCell({ date, log, onClick, disabled = false }) {
               <GoalIndicator
                 hit={pagesHit}
                 label="Pages"
-                value={log.pages}
+                value={pagesRead != null ? pagesRead : '—'}
                 unit="pg"
               />
               <div className="flex gap-3">
                 <span className={`text-xs ${stretchedHit ? 'text-success' : 'text-fail opacity-60'}`}>
-                  🧘{stretchedHit ? '✓' : '✗'}
+                  {stretchedHit ? '✓' : '✗'} str
                 </span>
                 <span className={`text-xs ${liftedHit ? 'text-success' : 'text-fail opacity-60'}`}>
-                  💪{liftedHit ? '✓' : '✗'}
+                  {liftedHit ? '✓' : '✗'} lft
                 </span>
               </div>
             </div>

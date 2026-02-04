@@ -11,16 +11,17 @@ import {
   isFuture,
   addMonths,
   subMonths,
+  subDays,
 } from 'date-fns'
 import { supabase } from '../lib/supabase'
 import { GOALS } from '../types'
+import { computePagesRead, readingGoalMet } from '../lib/pages'
 
-function dayHitAllGoals(log) {
+function dayHitAllGoals(log, pagesRead) {
   if (!log) return null
   const stepsHit = log.steps >= GOALS.steps
-  const pagesHit = log.pages >= GOALS.pages
+  const pagesHit = readingGoalMet(pagesRead)
   const stretchHit = log.stretched === true
-  // Lifted is weekly, so we don't require it daily for the checkmark
   return stepsHit && pagesHit && stretchHit
 }
 
@@ -35,17 +36,22 @@ export function Calendar({ userId, userName, onClose }) {
 
       const monthStart = startOfMonth(currentMonth)
       const monthEnd = endOfMonth(currentMonth)
+      // Fetch one day before month start for delta calculation
+      const lookbackDay = subDays(monthStart, 1)
 
       if (!supabase) {
-        // Demo mode - generate random data
-        const days = eachDayOfInterval({ start: monthStart, end: monthEnd })
+        // Demo mode - generate random cumulative data
+        const days = eachDayOfInterval({ start: lookbackDay, end: monthEnd })
         const demoLogs = {}
+        let runningPage = Math.floor(Math.random() * 100) + 50
         days.forEach(day => {
           if (!isFuture(day)) {
             const dateKey = format(day, 'yyyy-MM-dd')
+            const pagesReadToday = Math.floor(Math.random() * 15) + 3
+            runningPage += pagesReadToday
             demoLogs[dateKey] = {
               steps: Math.floor(Math.random() * 5000) + 4000,
-              pages: Math.floor(Math.random() * 15) + 3,
+              current_page: runningPage,
               stretched: Math.random() > 0.3,
             }
           }
@@ -58,9 +64,9 @@ export function Calendar({ userId, userName, onClose }) {
       try {
         const { data } = await supabase
           .from('daily_logs')
-          .select('date, steps, pages, stretched')
+          .select('date, steps, current_page, stretched')
           .eq('user_id', userId)
-          .gte('date', format(monthStart, 'yyyy-MM-dd'))
+          .gte('date', format(lookbackDay, 'yyyy-MM-dd'))
           .lte('date', format(monthEnd, 'yyyy-MM-dd'))
 
         const logsByDate = {}
@@ -77,8 +83,24 @@ export function Calendar({ userId, userName, onClose }) {
     fetchMonthData()
   }, [currentMonth, userId])
 
+  // Pre-compute page deltas for the month
+  const pagesReadByDay = {}
   const monthStart = startOfMonth(currentMonth)
   const monthEnd = endOfMonth(currentMonth)
+  const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd })
+
+  monthDays.forEach(day => {
+    const dateKey = format(day, 'yyyy-MM-dd')
+    const log = dailyLogs[dateKey]
+    if (!log) return
+
+    const prevKey = format(subDays(day, 1), 'yyyy-MM-dd')
+    const prevLog = dailyLogs[prevKey]
+    const prevPage = prevLog?.current_page ?? null
+
+    pagesReadByDay[dateKey] = computePagesRead(log.current_page, prevPage)
+  })
+
   const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 })
   const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 1 })
   const calendarDays = eachDayOfInterval({ start: calendarStart, end: calendarEnd })
@@ -145,7 +167,8 @@ export function Calendar({ userId, userName, onClose }) {
               const today = isToday(day)
               const future = isFuture(day)
               const log = dailyLogs[dateKey]
-              const hitGoals = dayHitAllGoals(log)
+              const pagesRead = pagesReadByDay[dateKey] ?? null
+              const hitGoals = dayHitAllGoals(log, pagesRead)
 
               return (
                 <div
